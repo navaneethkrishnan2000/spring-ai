@@ -5,6 +5,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class ChatController {
@@ -44,4 +45,17 @@ public class ChatController {
            - In the media section I need to provide the kind of image that I am going to give, and then a resource value.
            - If we directly give the file it shows error, so we have to convert this multipart file into a resource using InputStreamResource
     */
+
+    // Streaming real time response
+    @GetMapping("/chat-with-stream")
+    public Flux<String> chatWithFlux (@RequestParam("message") String message) {
+        return chatClient.prompt()
+                .user(message)
+                .stream()
+                .content()
+                .doOnNext(s -> {
+                    System.out.print(s);
+                });
+    }
+
 }
