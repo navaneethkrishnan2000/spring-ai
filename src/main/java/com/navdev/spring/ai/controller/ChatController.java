@@ -1,9 +1,10 @@
 package com.navdev.spring.ai.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ChatController {
@@ -14,6 +15,7 @@ public class ChatController {
         this.chatClient = chatClient;
     }
 
+    // For Text only Prompts
     @GetMapping("/chat")
     public String chat(@RequestParam("message") String message) {
         return chatClient.prompt() // Called the prompt
@@ -22,4 +24,18 @@ public class ChatController {
                 .content(); // Get the output as String
     }
 
+    // For Multimodality
+    @PostMapping("/chat-with-image")
+    public String chatWithImg(
+            @RequestPart("message") String message,
+            @RequestPart("image") MultipartFile file) // @RequestPart accepts images as parameters
+    {
+        return chatClient.prompt()
+                .user(promptUserSpec -> {
+                    promptUserSpec.text(message)
+                            .media(MimeTypeUtils.IMAGE_PNG, new InputStreamResource(file));
+                })
+                .call()
+                .content();
+    }
 }
