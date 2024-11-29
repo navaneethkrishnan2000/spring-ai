@@ -27,7 +27,7 @@ public class ChatController {
     // For Multimodality
     @PostMapping("/chat-with-image")
     public String chatWithImg(
-            @RequestPart("message") String message,
+            @RequestPart("message") String message, // @RequestPart annotation is essential for handling specific parts of a multipart request, especially for file uploads combined with other form data.It offers flexibility by allowing you to handle files and other data independently, making it suitable for building robust upload APIs.
             @RequestPart("image") MultipartFile file) // @RequestPart accepts images as parameters
     {
         return chatClient.prompt()
@@ -38,4 +38,10 @@ public class ChatController {
                 .call()
                 .content();
     }
+    /*
+        In the user section we have to use promptUserSpec, inside the prompt we have to specify the media and the text.
+        In the text option we have to pass the file and in the media options we have to pass the MultipartFile received through this request,
+           - In the media section I need to provide the kind of image that I am going to give, and then a resource value.
+           - If we directly give the file it shows error, so we have to convert this multipart file into a resource using InputStreamResource
+    */
 }
